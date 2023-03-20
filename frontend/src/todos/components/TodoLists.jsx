@@ -1,16 +1,13 @@
-import React, { Fragment, useState, useEffect } from 'react'
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import {
   Card,
   CardContent,
   List,
-  ListItemButton,
-  ListItemText,
-  ListItemIcon,
-  Typography,
-} from '@mui/material'
-import ReceiptIcon from '@mui/icons-material/Receipt'
-import { TodoListForm } from './TodoListForm'
+  ListItemButton, ListItemIcon, ListItemText, Typography
+} from '@mui/material';
+import React, { Fragment, useEffect, useState } from 'react';
 import { fetchTodoList, updateTodoList } from "../services/TodoService";
+import { TodoListForm } from './TodoListForm';
 
 export const TodoLists = ({ style }) => {
   const [todoLists, setTodoLists] = useState({})
@@ -21,9 +18,10 @@ export const TodoLists = ({ style }) => {
   }, [])
 
   useEffect(() => {
-    if (Object.keys(todoLists).length > 0) {
+    if (Object.keys(todoLists).length > 0 && activeList) {
       updateTodoList(JSON.stringify(todoLists))
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [todoLists])
 
   if (!Object.keys(todoLists).length) return null

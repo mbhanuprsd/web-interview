@@ -1,15 +1,33 @@
-import React, { useState } from 'react'
-import { TextField, Card, CardContent, CardActions, Button, Typography } from '@mui/material'
-import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
+import DeleteIcon from '@mui/icons-material/Delete'
+import { Button, Card, CardActions, CardContent, TextField, Typography } from '@mui/material'
+import React, { useEffect, useRef, useState } from 'react'
 
 export const TodoListForm = ({ todoList, saveTodoList }) => {
   const [todos, setTodos] = useState(todoList.todos)
+  const firstUpdate = useRef(true);
+  const { current } = useRef({ timer: null })
 
   const handleSubmit = (event) => {
     event.preventDefault()
     saveTodoList(todoList.id, { todos })
   }
+
+  useEffect(() => {
+    // To avoid calling the Update Todo API when loading the form
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      return
+    }
+
+    if (current.timer) clearTimeout(current.timer)
+
+    current.timer = setTimeout(() => {
+      current.timer = null
+      saveTodoList(todoList.id, { todos })
+    }, 1000); // 1 second delay before auto saving after add, delete or update on todos
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [todos])
 
   return (
     <Card sx={{ margin: '0 1rem' }}>
