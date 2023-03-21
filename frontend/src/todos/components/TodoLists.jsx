@@ -8,10 +8,19 @@ import {
 import React, { Fragment, useEffect, useState } from 'react';
 import { fetchTodoList, updateTodoList } from "../services/TodoService";
 import { TodoListForm } from './TodoListForm';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 export const TodoLists = ({ style }) => {
   const [todoLists, setTodoLists] = useState({})
   const [activeList, setActiveList] = useState()
+
+  const checkListDone = (listKey) => {
+    const selectedTodos = todoLists[listKey]["todos"]
+    for (let index = 0; index < selectedTodos.length; index++) {
+      if (selectedTodos[index]["done"] === false) return false
+    }
+    return true;
+  }
 
   useEffect(() => {
     fetchTodoList().then(setTodoLists)
@@ -21,7 +30,7 @@ export const TodoLists = ({ style }) => {
     if (Object.keys(todoLists).length > 0 && activeList) {
       updateTodoList(JSON.stringify(todoLists))
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [todoLists])
 
   if (!Object.keys(todoLists).length) return null
@@ -35,6 +44,10 @@ export const TodoLists = ({ style }) => {
               <ListItemButton key={key} onClick={() => setActiveList(key)}>
                 <ListItemIcon>
                   <ReceiptIcon />
+                </ListItemIcon>
+                <ListItemIcon>
+                {(todoLists[key].todos.length > 0 && checkListDone(key))
+                  ? <CheckCircleIcon color='primary' /> : <CheckCircleIcon htmlColor='#eee'/>}
                 </ListItemIcon>
                 <ListItemText primary={todoLists[key].title} />
               </ListItemButton>

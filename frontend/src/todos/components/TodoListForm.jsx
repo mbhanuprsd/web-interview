@@ -7,6 +7,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
   const [todos, setTodos] = useState(todoList.todos)
   const firstUpdate = useRef(true);
   const { current } = useRef({ timer: null })
+  const [isTextUpdate, setIsTextUpdate] = useState(false)
 
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -25,7 +26,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
     current.timer = setTimeout(() => {
       current.timer = null
       saveTodoList(todoList.id, { todos })
-    }, 1000); // 1 second delay before auto saving after add, delete or update on todos
+    }, isTextUpdate ? 1000 : 0); // 1 second buffer before autosave if text is updating
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [todos])
 
@@ -47,6 +48,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
                 label='What to do?'
                 value={item.todo}
                 onChange={(event) => {
+                  setIsTextUpdate(true)
                   setTodos([
                     // immutable update
                     ...todos.slice(0, index),
@@ -61,6 +63,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
               <Checkbox 
               checked={item.done}
               onChange={(e) => {
+                setIsTextUpdate(false)
                 setTodos([
                   // immutable update
                   ...todos.slice(0, index),
@@ -77,6 +80,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
                 size='small'
                 color='secondary'
                 onClick={() => {
+                  setIsTextUpdate(false)
                   setTodos([
                     // immutable delete
                     ...todos.slice(0, index),
@@ -93,6 +97,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
               type='button'
               color='primary'
               onClick={() => {
+                setIsTextUpdate(false)
                 setTodos([...todos, {"todo": "", "done": false}])
               }}
             >
