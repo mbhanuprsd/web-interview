@@ -5,7 +5,8 @@
         "todos": [
             {
                 "todo": "First todo of first list!",
-                "done": false
+                "done": false,
+                "due": "2023-03-21"
             }
         ]
     },
@@ -15,7 +16,8 @@
         "todos": [
             {
                 "todo": "First todo of second list!",
-                "done": false
+                "done": false,
+                "due": "2023-03-21"
             }
         ]
     }

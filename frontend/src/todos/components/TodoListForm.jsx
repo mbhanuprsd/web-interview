@@ -2,6 +2,7 @@ import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { Button, Card, CardActions, CardContent, Checkbox, TextField, Typography } from '@mui/material'
 import React, { useEffect, useRef, useState } from 'react'
+import DatePicker, { convertDate } from './DatePicker'
 
 export const TodoListForm = ({ todoList, saveTodoList }) => {
   const [todos, setTodos] = useState(todoList.todos)
@@ -54,26 +55,43 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
                     ...todos.slice(0, index),
                     {
                       "todo": event.target.value,
-                      "done": item.done
+                      "done": item.done,
+                      "due": item.due
                     },
                     ...todos.slice(index + 1),
                   ])
                 }}
               />
-              <Checkbox 
-              checked={item.done}
-              onChange={(e) => {
-                setIsTextUpdate(false)
-                setTodos([
-                  // immutable update
-                  ...todos.slice(0, index),
-                  {
-                    "todo": item.todo,
-                    "done": e.target.checked
-                  },
-                  ...todos.slice(index + 1),
-                ])
-              }}
+              <DatePicker
+                todo={item}
+                onDateChange={(date) => {
+                  setIsTextUpdate(false)
+                  setTodos([
+                    // immutable update
+                    ...todos.slice(0, index),
+                    {
+                      "todo": item.todo,
+                      "done": item.done,
+                      "due": date
+                    },
+                    ...todos.slice(index + 1),
+                  ])
+                }} />
+              <Checkbox
+                checked={item.done}
+                onChange={(e) => {
+                  setIsTextUpdate(false)
+                  setTodos([
+                    // immutable update
+                    ...todos.slice(0, index),
+                    {
+                      "todo": item.todo,
+                      "done": e.target.checked,
+                      "due": item.due
+                    },
+                    ...todos.slice(index + 1),
+                  ])
+                }}
               />
               <Button
                 sx={{ margin: '8px' }}
@@ -98,7 +116,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
               color='primary'
               onClick={() => {
                 setIsTextUpdate(false)
-                setTodos([...todos, {"todo": "", "done": false}])
+                setTodos([...todos, { "todo": "", "done": false, "due": convertDate(new Date()) }])
               }}
             >
               Add Todo <AddIcon />
