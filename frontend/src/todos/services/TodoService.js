@@ -8,6 +8,7 @@ export async function fetchTodoList() {
         const respose = await fetch(BASE_URL + '/todos')
         return await respose.json()
     } catch (error) {
+        console.log(error)
         return {}
     }
 }
@@ -26,6 +27,7 @@ export async function updateTodoList(data) {
         })
         return await respose.json()
     } catch (error) {
+        console.log(error)
         return {}
     }
 }

@@ -1,35 +1,27 @@
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { Button, Card, CardActions, CardContent, Checkbox, TextField, Typography } from '@mui/material'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import DatePicker, { convertDate } from './DatePicker'
 
 export const TodoListForm = ({ todoList, saveTodoList }) => {
   const [todos, setTodos] = useState(todoList.todos)
-  const firstUpdate = useRef(true);
   const { current } = useRef({ timer: null })
-  const [isTextUpdate, setIsTextUpdate] = useState(false)
 
   const handleSubmit = (event) => {
     event.preventDefault()
     saveTodoList(todoList.id, { todos })
   }
 
-  useEffect(() => {
-    // To avoid calling the Update Todo API when loading the form
-    if (firstUpdate.current) {
-      firstUpdate.current = false;
-      return
-    }
-
+  const onTodoChange = (updatedTodos, isTextUpdate) => {
+    setTodos(updatedTodos)
     if (current.timer) clearTimeout(current.timer)
 
     current.timer = setTimeout(() => {
       current.timer = null
-      saveTodoList(todoList.id, { todos })
+      saveTodoList(todoList.id, { "todos": updatedTodos })
     }, isTextUpdate ? 1000 : 0); // 1 second buffer before autosave if text is updating
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [todos])
+  }
 
   return (
     <Card sx={{ margin: '0 1rem' }}>
@@ -49,8 +41,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
                 label='What to do?'
                 value={item.todo}
                 onChange={(event) => {
-                  setIsTextUpdate(true)
-                  setTodos([
+                  const updatedTodos = [
                     // immutable update
                     ...todos.slice(0, index),
                     {
@@ -59,14 +50,14 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
                       "due": item.due
                     },
                     ...todos.slice(index + 1),
-                  ])
+                  ]
+                  onTodoChange(updatedTodos, true)
                 }}
               />
               <DatePicker
                 todo={item}
                 onDateChange={(date) => {
-                  setIsTextUpdate(false)
-                  setTodos([
+                  const updatedTodos = [
                     // immutable update
                     ...todos.slice(0, index),
                     {
@@ -75,13 +66,13 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
                       "due": date
                     },
                     ...todos.slice(index + 1),
-                  ])
+                  ]
+                  onTodoChange(updatedTodos, false)
                 }} />
               <Checkbox
                 checked={item.done}
                 onChange={(e) => {
-                  setIsTextUpdate(false)
-                  setTodos([
+                  const updatedTodos = [
                     // immutable update
                     ...todos.slice(0, index),
                     {
@@ -90,7 +81,8 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
                       "due": item.due
                     },
                     ...todos.slice(index + 1),
-                  ])
+                  ]
+                  onTodoChange(updatedTodos, false)
                 }}
               />
               <Button
@@ -98,12 +90,12 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
                 size='small'
                 color='secondary'
                 onClick={() => {
-                  setIsTextUpdate(false)
-                  setTodos([
+                  const updatedTodos = [
                     // immutable delete
                     ...todos.slice(0, index),
                     ...todos.slice(index + 1),
-                  ])
+                  ]
+                  onTodoChange(updatedTodos, false)
                 }}
               >
                 <DeleteIcon />
@@ -115,14 +107,11 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
               type='button'
               color='primary'
               onClick={() => {
-                setIsTextUpdate(false)
-                setTodos([...todos, { "todo": "", "done": false, "due": convertDate(new Date()) }])
+                const updatedTodos = [...todos, { "todo": "", "done": false, "due": convertDate(new Date()) }]
+                onTodoChange(updatedTodos, false)
               }}
             >
               Add Todo <AddIcon />
-            </Button>
-            <Button type='submit' variant='contained' color='primary'>
-              Save
             </Button>
           </CardActions>
         </form>

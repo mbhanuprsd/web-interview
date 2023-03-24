@@ -14,24 +14,15 @@ export const TodoLists = ({ style }) => {
   const [todoLists, setTodoLists] = useState({})
   const [activeList, setActiveList] = useState()
 
-  const checkListDone = (listKey) => {
-    const selectedTodos = todoLists[listKey]["todos"]
-    for (let index = 0; index < selectedTodos.length; index++) {
-      if (selectedTodos[index]["done"] === false) return false
-    }
-    return true;
+  const isTodoDone = (todo) => todo["done"] === true;
+
+  const checkListDone = (selectedTodos) =>{
+    return selectedTodos.every(isTodoDone)
   }
 
   useEffect(() => {
     fetchTodoList().then(setTodoLists)
   }, [])
-
-  useEffect(() => {
-    if (Object.keys(todoLists).length > 0 && activeList) {
-      updateTodoList(JSON.stringify(todoLists))
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [todoLists])
 
   if (!Object.keys(todoLists).length) return null
   return (
@@ -46,7 +37,7 @@ export const TodoLists = ({ style }) => {
                   <ReceiptIcon />
                 </ListItemIcon>
                 <ListItemIcon>
-                {(todoLists[key].todos.length > 0 && checkListDone(key))
+                {(todoLists[key].todos.length > 0 && checkListDone(todoLists[key].todos))
                   ? <CheckCircleIcon color='primary' /> : <CheckCircleIcon htmlColor='#eee'/>}
                 </ListItemIcon>
                 <ListItemText primary={todoLists[key].title} />
@@ -61,10 +52,12 @@ export const TodoLists = ({ style }) => {
           todoList={todoLists[activeList]}
           saveTodoList={(id, { todos }) => {
             const listToUpdate = todoLists[id]
-            setTodoLists({
+            var updatedLists = {
               ...todoLists,
               [id]: { ...listToUpdate, todos },
-            })
+            }
+            setTodoLists(updatedLists)
+            updateTodoList(JSON.stringify(updatedLists))
           }}
         />
       )}
